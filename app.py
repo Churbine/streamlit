@@ -4,29 +4,39 @@ from PIL import Image
 from io import BytesIO
 import os
 import requests
-import tarfile  # Use this for extracting tar files
+import tarfile
+import zipfile  # This is for extracting .zip files
 
 def download_ffmpeg():
     ffmpeg_url = "https://drive.google.com/uc?export=download&id=1PxrQ-xEV_CzXDtIrWZVj13mdfF-XVTsm"  # Replace with your direct FFmpeg link
     ffmpeg_path = "ffmpeg.tar.xz"  # Temporary path to download the tar file
 
-    # Download the FFmpeg tar.xz file
+    # Download the FFmpeg file (could be tar.xz or zip)
     response = requests.get(ffmpeg_url)
     with open(ffmpeg_path, "wb") as f:
         f.write(response.content)
 
-    # Extract FFmpeg binary from the tar.xz file
-    if ffmpeg_path.endswith("tar.xz"):
+    # Check file extension and extract accordingly
+    if ffmpeg_path.endswith(".tar.xz"):
         with tarfile.open(ffmpeg_path, "r:xz") as tar:
             tar.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
+    elif ffmpeg_path.endswith(".tar.gz"):
+        with tarfile.open(ffmpeg_path, "r:gz") as tar:
+            tar.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
+    elif ffmpeg_path.endswith(".zip"):
+        with zipfile.ZipFile(ffmpeg_path, 'r') as zip_ref:
+            zip_ref.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
+    else:
+        raise Exception("Unsupported file format for FFmpeg download")
 
-    os.remove(ffmpeg_path)  # Clean up the tar file
+    os.remove(ffmpeg_path)  # Clean up the downloaded file
 
     # Return path to the FFmpeg binary
     return os.path.join("ffmpeg", "ffmpeg.exe")
 
 # Call this function at the start of your app
 ffmpeg_path = download_ffmpeg()
+
 
 # --- Utils ---
 class MyLogger:
