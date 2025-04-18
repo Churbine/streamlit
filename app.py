@@ -3,35 +3,32 @@ import yt_dlp
 from PIL import Image
 from io import BytesIO
 import os
+import requests
 import tarfile
-import urllib.request
 
-def download_ffmpeg():
-    url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
-    archive_name = "ffmpeg-release.tar.xz"
+def download_and_extract_ffmpeg():
+    url = "https://drive.google.com/file/d/1WAGOmqa-6yABjuCJ9LjEQs-v3GKxWIWG/view?usp=sharing"
+    filename = "ffmpeg.tar.xz"
     extract_dir = "ffmpeg"
 
     if not os.path.exists(extract_dir):
-        print("Downloading FFmpeg...")
-        urllib.request.urlretrieve(url, archive_name)
+        response = requests.get(url)
+        with open(filename, "wb") as f:
+            f.write(response.content)
 
-        print("Extracting FFmpeg...")
-        with tarfile.open(archive_name, "r:xz") as tar:
+        with tarfile.open(filename, "r:xz") as tar:
             tar.extractall(extract_dir)
 
-    # Locate the actual ffmpeg binary
+    # Find ffmpeg binary inside extracted folder
     for root, dirs, files in os.walk(extract_dir):
-        if "ffmpeg" in files:
-            ffmpeg_path = os.path.join(root, "ffmpeg")
-            os.chmod(ffmpeg_path, 0o755)  # Make executable
-            print(f"FFmpeg binary located at: {ffmpeg_path}")
-            return ffmpeg_path
+        for file in files:
+            if file == "ffmpeg":
+                return os.path.abspath(os.path.join(root, file))
 
     raise FileNotFoundError("FFmpeg binary not found after extraction.")
 
-# Example usage
-ffmpeg_path = download_ffmpeg()
-# You can now call ffmpeg with this path in your app, e.g., for yt-dlp or other processes
+
+
 
 
 # --- Utils ---
