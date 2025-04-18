@@ -4,22 +4,23 @@ from PIL import Image
 from io import BytesIO
 import os
 import requests
-from zipfile import ZipFile
+import tarfile  # Use this for extracting tar files
 
 def download_ffmpeg():
-    ffmpeg_url = "https://drive.google.com/file/d/1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv/view?usp=drive_link"  # Replace with your FFmpeg link
-    ffmpeg_path = "ffmpeg.zip"  # Temporary path to download the zip file
+    ffmpeg_url = "https://drive.google.com/file/d/1PxrQ-xEV_CzXDtIrWZVj13mdfF-XVTsm/view?usp=sharing"  # Replace with your direct FFmpeg link
+    ffmpeg_path = "ffmpeg.tar.xz"  # Temporary path to download the tar file
 
-    # Download the file
+    # Download the FFmpeg tar.xz file
     response = requests.get(ffmpeg_url)
     with open(ffmpeg_path, "wb") as f:
         f.write(response.content)
 
-    # Extract FFmpeg if it's in a ZIP file
-    with ZipFile(ffmpeg_path, 'r') as zip_ref:
-        zip_ref.extractall("ffmpeg")
+    # Extract FFmpeg binary from the tar.xz file
+    if ffmpeg_path.endswith("tar.xz"):
+        with tarfile.open(ffmpeg_path, "r:xz") as tar:
+            tar.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
 
-    os.remove(ffmpeg_path)  # Clean up the zip file
+    os.remove(ffmpeg_path)  # Clean up the tar file
 
     # Return path to the FFmpeg binary
     return os.path.join("ffmpeg", "ffmpeg.exe")
