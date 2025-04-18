@@ -4,38 +4,37 @@ from PIL import Image
 from io import BytesIO
 import os
 import requests
-import tarfile
-import zipfile  # This is for extracting .zip files
 
-def download_ffmpeg():
-    ffmpeg_url = "https://drive.google.com/uc?export=download&id=1WAGOmqa-6yABjuCJ9LjEQs-v3GKxWIWG"  # Replace with your direct FFmpeg link
-    ffmpeg_path = "ffmpeg.tar.xz"  # Temporary path to download the tar file
+def download_file_from_google_drive(file_id, destination):
+    URL = f"https://drive.google.com/uc?export=download&id={file_id}"
+    session = requests.Session()
 
-    # Download the FFmpeg file (could be tar.xz or zip)
-    response = requests.get(ffmpeg_url)
-    with open(ffmpeg_path, "wb") as f:
-        f.write(response.content)
+    response = session.get(URL, stream=True)
+    token = None
 
-    # Check file extension and extract accordingly
-    if ffmpeg_path.endswith(".tar.xz"):
-        with tarfile.open(ffmpeg_path, "r:xz") as tar:
-            tar.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
-    elif ffmpeg_path.endswith(".tar.gz"):
-        with tarfile.open(ffmpeg_path, "r:gz") as tar:
-            tar.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
-    elif ffmpeg_path.endswith(".zip"):
-        with zipfile.ZipFile(ffmpeg_path, 'r') as zip_ref:
-            zip_ref.extractall("ffmpeg")  # Extract to 'ffmpeg' folder
-    else:
-        raise Exception("Unsupported file format for FFmpeg download")
+    # Check for the download warning and handle the download accordingly
+    for key, value in response.cookies.items():
+        if key.startswith("download_warning"):
+            token = value
 
-    os.remove(ffmpeg_path)  # Clean up the downloaded file
+    if token:
+        params = { "confirm": token }
+        response = session.get(URL, params=params, stream=True)
 
-    # Return path to the FFmpeg binary
-    return os.path.join("ffmpeg", "ffmpeg.exe")
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(1024):
+            if chunk:
+                f.write(chunk)
+    
+    print(f"Downloaded ffmpeg.exe to {destination}")
 
-# Call this function at the start of your app
-ffmpeg_path = download_ffmpeg()
+# Your Google Drive file ID
+file_id = "1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv"  # Your provided file ID
+destination = "ffmpeg.exe"
+download_file_from_google_drive(file_id, destination)
+
+# Now you can use 'ffmpeg.exe' in your project
+ffmpeg_path = os.path.abspath("ffmpeg.exe")
 
 
 # --- Utils ---
