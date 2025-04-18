@@ -3,44 +3,34 @@ import yt_dlp
 from PIL import Image
 from io import BytesIO
 import os
-import requests
+import tarfile
+import urllib.request
 
-# Function to download file from Google Drive
-def download_file_from_google_drive(file_id, destination):
-    URL = f"https://drive.google.com/uc?export=download&id={file_id}"
-    session = requests.Session()
+def download_ffmpeg():
+    url = "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz"
+    archive_name = "ffmpeg-release.tar.xz"
+    extract_dir = "ffmpeg"
 
-    # Make the initial request to get the confirmation token
-    response = session.get(URL, stream=True)
-    token = None
+    if not os.path.exists(extract_dir):
+        print("Downloading FFmpeg...")
+        urllib.request.urlretrieve(url, archive_name)
 
-    # Check for the download warning and handle the download accordingly
-    for key, value in response.cookies.items():
-        if key.startswith("download_warning"):
-            token = value
+        print("Extracting FFmpeg...")
+        with tarfile.open(archive_name, "r:xz") as tar:
+            tar.extractall(extract_dir)
 
-    if token:
-        params = { "confirm": token }
-        response = session.get(URL, params=params, stream=True)
+    # Locate the actual ffmpeg binary
+    for root, dirs, files in os.walk(extract_dir):
+        if "ffmpeg" in files:
+            ffmpeg_path = os.path.join(root, "ffmpeg")
+            os.chmod(ffmpeg_path, 0o755)  # Make executable
+            print(f"FFmpeg binary located at: {ffmpeg_path}")
+            return ffmpeg_path
 
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(1024):
-            if chunk:
-                f.write(chunk)
-    
-    print(f"Downloaded ffmpeg.exe to {destination}")
+    raise FileNotFoundError("FFmpeg binary not found after extraction.")
 
-# Your Google Drive file ID for ffmpeg.exe (make sure it's the right one)
-file_id = "1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv"  # Update with your actual file ID
-destination = "ffmpeg.exe"  # Name of the file after downloading
-
-# Download ffmpeg.exe
-download_file_from_google_drive(file_id, destination)
-
-# Now, use the downloaded ffmpeg.exe in your application
-ffmpeg_path = os.path.abspath("ffmpeg.exe")
-print(f"FFmpeg is located at: {ffmpeg_path}")
-
+# Example usage
+ffmpeg_path = download_ffmpeg()
 # You can now call ffmpeg with this path in your app, e.g., for yt-dlp or other processes
 
 
