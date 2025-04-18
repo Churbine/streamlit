@@ -7,7 +7,7 @@ import requests
 import tarfile  # Use this for extracting tar files
 
 def download_ffmpeg():
-    ffmpeg_url = "https://drive.google.com/file/d/1PxrQ-xEV_CzXDtIrWZVj13mdfF-XVTsm/view?usp=sharing"  # Replace with your direct FFmpeg link
+    ffmpeg_url = "https://drive.google.com/uc?export=download&id=1PxrQ-xEV_CzXDtIrWZVj13mdfF-XVTsm"  # Replace with your direct FFmpeg link
     ffmpeg_path = "ffmpeg.tar.xz"  # Temporary path to download the tar file
 
     # Download the FFmpeg tar.xz file
