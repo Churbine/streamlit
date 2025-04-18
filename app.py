@@ -5,10 +5,12 @@ from io import BytesIO
 import os
 import requests
 
+# Function to download file from Google Drive
 def download_file_from_google_drive(file_id, destination):
     URL = f"https://drive.google.com/uc?export=download&id={file_id}"
     session = requests.Session()
 
+    # Make the initial request to get the confirmation token
     response = session.get(URL, stream=True)
     token = None
 
@@ -28,13 +30,18 @@ def download_file_from_google_drive(file_id, destination):
     
     print(f"Downloaded ffmpeg.exe to {destination}")
 
-# Your Google Drive file ID
-file_id = "1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv"  # Your provided file ID
-destination = "ffmpeg.exe"
+# Your Google Drive file ID for ffmpeg.exe (make sure it's the right one)
+file_id = "1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv"  # Update with your actual file ID
+destination = "ffmpeg.exe"  # Name of the file after downloading
+
+# Download ffmpeg.exe
 download_file_from_google_drive(file_id, destination)
 
-# Now you can use 'ffmpeg.exe' in your project
+# Now, use the downloaded ffmpeg.exe in your application
 ffmpeg_path = os.path.abspath("ffmpeg.exe")
+print(f"FFmpeg is located at: {ffmpeg_path}")
+
+# You can now call ffmpeg with this path in your app, e.g., for yt-dlp or other processes
 
 
 # --- Utils ---
