@@ -8,7 +8,7 @@ import tarfile
 import zipfile  # This is for extracting .zip files
 
 def download_ffmpeg():
-    ffmpeg_url = "https://drive.google.com/uc?export=download&id=1PxrQ-xEV_CzXDtIrWZVj13mdfF-XVTsm"  # Replace with your direct FFmpeg link
+    ffmpeg_url = "https://drive.google.com/uc?export=download&id=1WAGOmqa-6yABjuCJ9LjEQs-v3GKxWIWG"  # Replace with your direct FFmpeg link
     ffmpeg_path = "ffmpeg.tar.xz"  # Temporary path to download the tar file
 
     # Download the FFmpeg file (could be tar.xz or zip)
