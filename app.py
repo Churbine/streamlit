@@ -4,6 +4,28 @@ from PIL import Image
 from io import BytesIO
 import requests
 import os
+from zipfile import Zipfile
+
+def download_ffmpeg():
+    ffmpeg_url = "https://drive.google.com/file/d/1wWOigaf0oyDGEaAI0KbgMX4GI2uwZpFv/view?usp=drive_link"  # Replace with your FFmpeg link
+    ffmpeg_path = "ffmpeg.zip"  # Temporary path to download the zip file
+
+    # Download the file
+    response = requests.get(ffmpeg_url)
+    with open(ffmpeg_path, "wb") as f:
+        f.write(response.content)
+
+    # Extract FFmpeg if it's in a ZIP file
+    with ZipFile(ffmpeg_path, 'r') as zip_ref:
+        zip_ref.extractall("ffmpeg")
+
+    os.remove(ffmpeg_path)  # Clean up the zip file
+
+    # Return path to the FFmpeg binary
+    return os.path.join("ffmpeg", "ffmpeg.exe")
+
+# Call this function at the start of your app
+ffmpeg_path = download_ffmpeg()
 
 # --- Utils ---
 class MyLogger:
